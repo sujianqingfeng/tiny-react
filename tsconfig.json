@@ -1,0 +1,32 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    // 当前使用的目标版本
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    // 构建产物的格式
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    // 模块解析策略
+    "moduleResolution": "Node",
+    "strict": true,
+    "sourceMap": true,
+    // json 文件支持
+    "resolveJsonModule": true,
+    // 独立模块，每个ts文件都是一个模块,都需要至少存在一个导入或导出语句
+    "isolatedModules": true,
+    // es模块导入cjs模块，兼容处理
+    "esModuleInterop": true,
+    // 是否写入文件系统
+    "noEmit": true,
+    // 是否允许存在声明但未使用的变量
+    "noUnusedLocals": true,
+    // 是否允许存在声明但未使用的函数参数
+    "noUnusedParameters": true,
+    // 是否必写return语句
+    "noImplicitReturns": false,
+    // 是否跳过lib.d.ts和 @types/下面的类型检查
+    "skipLibCheck": true,
+    "baseUrl": "./packages"
+  }
+}
