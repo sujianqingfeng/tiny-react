@@ -1,0 +1,12 @@
+{
+  "name": "react-reconciler",
+  "version": "1.0.0",
+  "description": "",
+  "author": "hens",
+  "license": "MIT",
+  "keywords": [],
+  "module": "main.ts",
+  "dependencies": {
+    "shared": "workspace:*"
+  }
+}
