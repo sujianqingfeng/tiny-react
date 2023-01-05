@@ -1,3 +1,4 @@
+import { Container } from 'hostConfig'
 import type { Key, Props, Ref } from 'shared/ReactTypes'
 import { Flags, NoFlags } from './fiberFlags'
 import type { WorkTag } from './workTags'
@@ -14,9 +15,11 @@ export class FiberNode {
   index: number 
 
   ref: Ref
-
+  
   pendingProps: Props
   memoizedProps: Props 
+  memoizedState: any
+  updateQueue: unknown
 
   alternative: FiberNode | null
   flags: Flags
@@ -45,9 +48,56 @@ export class FiberNode {
     this.pendingProps = pendingProps
     // 結束的props
     this.memoizedProps = null
+    // 结束的state
+    this.memoizedState = null
+    this.updateQueue = null
 
     // current workInProgress 兩個FiberNode指向對方
     this.alternative = null
     this.flags = NoFlags
   }
+}
+
+// 根节点
+export class FiberRootNode {
+  container: Container
+  // 主要关联 HostFiberNode
+  current: FiberNode
+  // 结束之后的
+  finishedWork: FiberNode | null
+
+  constructor(container: Container, hostFiberNode: FiberNode) {
+    this.container = container
+    this.current = hostFiberNode
+    this.finishedWork = null
+
+    // HostFiberNode 关联 FiberRootNode
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    hostFiberNode.stateNode = this
+  }
+}
+
+// 创建wip 双缓存机制
+export const createWorkInProcess = (current: FiberNode, pendingProps: Props): FiberNode => {
+  let wip = current.alternative
+
+  if (wip === null) {
+    // mount
+    wip = new FiberNode(current.tag, pendingProps, current.key)
+    wip.stateNode = current.stateNode
+
+    current.alternative = wip
+    wip.alternative = current
+  } else {
+    //update
+    wip.pendingProps = pendingProps
+    wip.flags = NoFlags
+  }
+  wip.type = current.type
+  wip.updateQueue = current.updateQueue
+  wip.child = current.child
+  wip.memoizedProps = current.memoizedProps
+  wip.memoizedState = current.memoizedState
+
+  return wip
 }

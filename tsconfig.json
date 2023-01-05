@@ -27,6 +27,9 @@
     "noImplicitReturns": false,
     // 是否跳过lib.d.ts和 @types/下面的类型检查
     "skipLibCheck": true,
-    "baseUrl": "./packages"
+    "baseUrl": "./packages",
+    "paths": {
+      "hostConfig": ["./react-reconciler/src/hostConfig.ts"]
+    }
   }
 }
