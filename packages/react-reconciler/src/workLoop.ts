@@ -41,7 +41,9 @@ export function renderRoot(root: FiberRootNode) {
       workLoop()
     } catch (error) {
       workInProgress = null
-      console.error('work loop error', error)
+      if (__DEV__) {
+        console.error('work loop error', error)
+      }
     }
   // eslint-disable-next-line no-constant-condition
   } while (true)

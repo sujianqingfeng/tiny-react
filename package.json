@@ -15,6 +15,7 @@
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
     "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-replace": "^5.0.2",
     "@sujian/eslint-config-typescript": "^0.0.20",
     "@types/node": "^18.11.18",
     "commitlint": "^17.3.0",
