@@ -23,6 +23,7 @@ export class FiberNode {
 
   alternative: FiberNode | null
   flags: Flags
+  subtreeFlags: Flags
 
   constructor(tag: WorkTag, pendingProps: Props, key: Key) {
     this.tag = tag
@@ -55,6 +56,7 @@ export class FiberNode {
     // current workInProgress 兩個FiberNode指向對方
     this.alternative = null
     this.flags = NoFlags
+    this.subtreeFlags = NoFlags
   }
 }
 
@@ -92,6 +94,7 @@ export const createWorkInProcess = (current: FiberNode, pendingProps: Props): Fi
     //update
     wip.pendingProps = pendingProps
     wip.flags = NoFlags
+    wip.subtreeFlags = NoFlags
   }
   wip.type = current.type
   wip.updateQueue = current.updateQueue

@@ -47,6 +47,9 @@ export function renderRoot(root: FiberRootNode) {
     }
   // eslint-disable-next-line no-constant-condition
   } while (true)
+
+  const finishedWork = root.current.alternative
+  root.finishedWork = finishedWork
 }
 
 function workLoop() {
@@ -84,4 +87,3 @@ function completeUnitOfWork(fiber: FiberNode) {
     workInProgress = node
   } while (node !== null)
 }
-

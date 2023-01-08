@@ -3,8 +3,8 @@ import { mountChildFibers, reconcileChildFibers } from './childFibers'
 import { FiberNode } from './fiber'
 import { processUpdateQueue, UpdateQueue } from './updateQueue'
 import { HostComponent, HostRoot, HostText } from './workTags'
-export function beginWork(wip: FiberNode) {
 
+export function beginWork(wip: FiberNode) {
   // 比较 返回子FiberNode
 
   switch (wip.type) {
@@ -21,6 +21,8 @@ export function beginWork(wip: FiberNode) {
       }
       break
   }
+
+  return null
 }
 
 function updateHostRoot(wip: FiberNode) {
