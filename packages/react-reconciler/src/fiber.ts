@@ -121,3 +121,4 @@ export function createFiberFromElement(element: ReactElementType) {
 
   return fiber
 }
+

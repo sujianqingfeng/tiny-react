@@ -1,6 +1,7 @@
 import { beginWork } from './beginWork'
 import { completeWork } from './completeWork'
 import { createWorkInProcess, FiberNode, FiberRootNode } from './fiber'
+import { MutationMask, NoFlags } from './fiberFlags'
 import { HostRoot } from './workTags'
 
 let workInProgress: FiberNode | null = null
@@ -39,6 +40,7 @@ export function renderRoot(root: FiberRootNode) {
   do {
     try {
       workLoop()
+      break
     } catch (error) {
       workInProgress = null
       if (__DEV__) {
@@ -50,6 +52,36 @@ export function renderRoot(root: FiberRootNode) {
 
   const finishedWork = root.current.alternative
   root.finishedWork = finishedWork
+
+  commitRoot(root)
+}
+
+function commitRoot(root: FiberRootNode) {
+  const finishedWork = root.finishedWork 
+
+  if (finishedWork === null) {
+    return
+  }
+
+  root.finishedWork  = null
+
+  if (__DEV__) {
+    console.log('commit start')
+  }
+
+  // 判断根节点以及子节点 是否存在更新
+  const subtreeHasEffect = (finishedWork.subtreeFlags & MutationMask) !== NoFlags
+  const rootHasEffect = (finishedWork.subtreeFlags & MutationMask) !== NoFlags
+
+  if (subtreeHasEffect || rootHasEffect) {
+    // beforeMutation
+    // mutation
+    // 切换fiber树
+    root.current = finishedWork
+    // layout
+  } else {
+    root.current = finishedWork
+  }
 }
 
 function workLoop() {
