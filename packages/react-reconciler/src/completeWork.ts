@@ -1,7 +1,7 @@
 import { appendInitialChild, Container, createInstance, createTextInstance } from 'hostConfig'
 import { FiberNode } from './fiber'
 import { NoFlags } from './fiberFlags'
-import { HostComponent, HostRoot, HostText } from './workTags'
+import { FunctionComponent, HostComponent, HostRoot, HostText } from './workTags'
 
 export function completeWork(wip: FiberNode) {
 
@@ -34,6 +34,10 @@ export function completeWork(wip: FiberNode) {
       return
 
     case HostRoot:
+      bubbleProperties(wip)
+      return null
+
+    case FunctionComponent:
       bubbleProperties(wip)
       return null
 
