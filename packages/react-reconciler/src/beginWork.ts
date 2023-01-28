@@ -8,7 +8,7 @@ import { FunctionComponent, HostComponent, HostRoot, HostText } from './workTags
 export function beginWork(wip: FiberNode) {
   // 比较 返回子FiberNode
 
-  switch (wip.type) {
+  switch (wip.tag) {
     case HostRoot:
       return updateHostRoot(wip)
     case HostComponent:
@@ -21,7 +21,7 @@ export function beginWork(wip: FiberNode) {
   
     default:
       if (__DEV__) {
-        console.log(`unknown ${wip.type}`)
+        console.log(`begin-work unknown ${wip.tag}`)
       }
       break
   }
@@ -60,9 +60,13 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
   const current = wip.alternative
   // 对比的是 current 下的 child fiber 和 react element type
 
+  console.log('reconcileChildren', current)
+  
   if (current !== null) {
+    console.log('update')
     wip.child = reconcileChildFibers(wip, current?.child, children)
   } else {
+    // mount
     wip.child = mountChildFibers(wip, null, children)
   }
 }

@@ -35,7 +35,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
       
         default:
           if (__DEV__) {
-            console.warn('未实现的reconcile类型', newChild)
+            console.warn('未实现的reconcile类型 1', newChild)
           }
           break
       }
@@ -45,6 +45,8 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
     // HostText
     if (typeof newChild === 'string' || typeof newChild === 'number') {
+      console.log('---HostText')
+      
       return placeSingleChild(reconcileSingleTextNode(returnFiber, currentFiber, newChild)) 
     }
 

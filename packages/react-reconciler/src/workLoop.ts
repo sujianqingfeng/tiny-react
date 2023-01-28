@@ -35,6 +35,7 @@ function maskUpdateFromToRoot(fiber: FiberNode) {
 }
 
 export function renderRoot(root: FiberRootNode) {
+  
   // 最开始的节点
   prepareFreshStack(root)
 

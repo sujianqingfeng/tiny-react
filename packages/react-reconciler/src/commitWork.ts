@@ -70,6 +70,7 @@ function getHostParent(fiber: FiberNode) {
     console.warn('get host parent is null')
   }
 
+  return null
 }
 
 function appendPlacementIntoContainer (finishedWork: FiberNode, hostParent: Container) {
@@ -80,7 +81,7 @@ function appendPlacementIntoContainer (finishedWork: FiberNode, hostParent: Cont
   }
 
   const child = finishedWork.child
-
+  
   if (child !== null) {
     appendPlacementIntoContainer(child, hostParent)
 

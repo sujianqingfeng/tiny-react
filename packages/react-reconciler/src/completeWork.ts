@@ -23,6 +23,7 @@ export function completeWork(wip: FiberNode) {
       
       return null
     case HostText:
+      
       if (current !== null && current.stateNode) {
       // update
       } else {
@@ -55,7 +56,7 @@ function appendAllChildren(parent: Container, wip: FiberNode) {
   let node = wip.child
 
   while (node !== null) {
-    if (node.type === HostComponent || node.type === HostText) {
+    if (node.tag === HostComponent || node.tag === HostText) {
       appendInitialChild(parent, node.stateNode)
     } else if (node.child !== null) {
       node.child.return = node
