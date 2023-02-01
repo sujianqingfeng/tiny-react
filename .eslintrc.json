@@ -1,3 +1,7 @@
 {
-  "extends": "@sujian/typescript"
+  "env": {
+    "jest": true
+  },
+  "extends": "@sujian/typescript",
+  "ignorePatterns": ["packages/**/*.test.ts"]
 }

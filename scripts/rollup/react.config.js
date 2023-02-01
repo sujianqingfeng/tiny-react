@@ -5,7 +5,7 @@ import { getBaseRollupPlugins, getPackageJson, resolvePkgPath } from './utils'
 
 const { name, module } = getPackageJson('react')
 const pkgPath = resolvePkgPath(name)
-const pkgDistPath = resolvePkgPath(`${name}/node_modules`, true)
+const pkgDistPath = resolvePkgPath(name, true)
 
 export default defineConfig([
   // react
