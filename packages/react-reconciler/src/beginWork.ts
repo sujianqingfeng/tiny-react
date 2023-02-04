@@ -57,13 +57,10 @@ function updateHostComponent(wip: FiberNode) {
 }
 
 function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
-  const current = wip.alternative
+  const current = wip.alternate
   // 对比的是 current 下的 child fiber 和 react element type
-
-  console.log('reconcileChildren', current)
   
   if (current !== null) {
-    console.log('update')
     wip.child = reconcileChildFibers(wip, current?.child, children)
   } else {
     // mount

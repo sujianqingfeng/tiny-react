@@ -74,7 +74,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
   }
 
   function placeSingleChild (fiber: FiberNode) {
-    if (shouldTrackEffects && fiber.alternative === null) {
+    if (shouldTrackEffects && fiber.alternate === null) {
       fiber.flags |= Placement
     }
 
@@ -100,8 +100,6 @@ function ChildReconciler(shouldTrackEffects: boolean) {
 
     // HostText
     if (typeof newChild === 'string' || typeof newChild === 'number') {
-      console.log('---HostText')
-      
       return placeSingleChild(reconcileSingleTextNode(returnFiber, currentFiber, newChild)) 
     }
 

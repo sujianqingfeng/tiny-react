@@ -21,7 +21,7 @@ export class FiberNode {
   memoizedState: any
   updateQueue: unknown
 
-  alternative: FiberNode | null
+  alternate: FiberNode | null
   flags: Flags
   subtreeFlags: Flags
   deletions: FiberNode[] | null
@@ -55,7 +55,7 @@ export class FiberNode {
     this.updateQueue = null
 
     // current workInProgress 兩個FiberNode指向對方
-    this.alternative = null
+    this.alternate = null
     this.flags = NoFlags
     this.subtreeFlags = NoFlags
     this.deletions = null
@@ -83,15 +83,15 @@ export class FiberRootNode {
 
 // 创建wip 双缓存机制
 export const createWorkInProcess = (current: FiberNode, pendingProps: Props): FiberNode => {
-  let wip = current.alternative
+  let wip = current.alternate
 
   if (wip === null) {
     // mount
     wip = new FiberNode(current.tag, pendingProps, current.key)
     wip.stateNode = current.stateNode
 
-    current.alternative = wip
-    wip.alternative = current
+    current.alternate = wip
+    wip.alternate = current
   } else {
     //update
     wip.pendingProps = pendingProps

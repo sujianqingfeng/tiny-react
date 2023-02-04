@@ -4,13 +4,13 @@ import { NoFlags, Update } from './fiberFlags'
 import { FunctionComponent, HostComponent, HostRoot, HostText } from './workTags'
 
 function markUpdate(fiber: FiberNode) {
-  fiber.flags != Update
+  fiber.flags |= Update
 }
 
 export function completeWork(wip: FiberNode) {
 
   const newProps = wip.pendingProps
-  const current = wip.alternative
+  const current = wip.alternate
 
   switch (wip.tag) {
     case HostComponent:
@@ -94,6 +94,7 @@ function appendAllChildren(parent: Container, wip: FiberNode) {
 function bubbleProperties(wip: FiberNode) {
   let subtreeFlags = NoFlags
   let child = wip.child
+
   while (child !== null) {
     subtreeFlags |= child.subtreeFlags
     subtreeFlags |= child.flags

@@ -13,13 +13,13 @@ function prepareFreshStack(root: FiberRootNode) {
 
 // 调度update
 export function scheduleUpdateOnFiber(fiber: FiberNode) {
-  const root = maskUpdateFromToRoot(fiber)
+  const root = markUpdateFromFiberToRoot(fiber)
   // fiberNodeRoot
   renderRoot(root)
 }
 
 // 从当前fiber找到FiberRootNode
-function maskUpdateFromToRoot(fiber: FiberNode) {
+function markUpdateFromFiberToRoot(fiber: FiberNode) {
   let node = fiber
   let parent = node.return
   while (parent !== null) {
@@ -52,7 +52,7 @@ export function renderRoot(root: FiberRootNode) {
   // eslint-disable-next-line no-constant-condition
   } while (true)
 
-  const finishedWork = root.current.alternative
+  const finishedWork = root.current.alternate
   root.finishedWork = finishedWork
 
   commitRoot(root)
@@ -73,7 +73,7 @@ function commitRoot(root: FiberRootNode) {
 
   // 判断根节点以及子节点 是否存在更新
   const subtreeHasEffect = (finishedWork.subtreeFlags & MutationMask) !== NoFlags
-  const rootHasEffect = (finishedWork.subtreeFlags & MutationMask) !== NoFlags
+  const rootHasEffect = (finishedWork.flags & MutationMask) !== NoFlags
 
   if (subtreeHasEffect || rootHasEffect) {
     // beforeMutation
