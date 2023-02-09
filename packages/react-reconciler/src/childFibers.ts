@@ -1,8 +1,11 @@
+import { type } from 'os'
 import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols'
 import { Props, ReactElementType } from 'shared/ReactTypes'
 import { createFiberFromElement, createWorkInProcess, FiberNode } from './fiber'
 import { ChildDeletion, Placement } from './fiberFlags'
 import { HostText } from './workTags'
+
+type ExistingChildren = Map<string|number, FiberNode>
 
 function ChildReconciler(shouldTrackEffects: boolean) {
 
@@ -98,6 +101,112 @@ function ChildReconciler(shouldTrackEffects: boolean) {
     return fiber
   }
 
+  function reconcileChildrenArray(returnFiber: FiberNode, currentFirstChild: FiberNode | null, newChild: any[]) {
+
+    // 最后一个可复用的fiber在current 中的位置
+    let lastPlacedIndex = 0
+    // 创建最后一个fiber
+    let lastNewFiber: FiberNode | null = null
+    // 创建第一个fiber
+    let firstNewFiber: FiberNode | null = null
+
+    // 将current 保存在map中
+    const existingChildren: ExistingChildren =  new Map()
+    let current = currentFirstChild
+    while (current !== null) {
+      const keyToUse = current.key != null ? current.key :  current.index
+      existingChildren.set(keyToUse, current)
+      current = current.sibling
+    }
+
+    for (let i = 0; i < newChild.length; i++) {
+      // 遍历newChild 寻找是否可复用
+      const after = newChild[i]
+      const newFiber = updateFromMap(returnFiber, existingChildren, i, after)
+
+      if (newFiber === null) {
+        continue
+      }
+      // 标记移动还是插入
+      newFiber.index = i
+      newFiber.return = returnFiber
+
+      if (lastNewFiber === null) {
+        lastNewFiber = newFiber
+        firstNewFiber  = newFiber
+      } else {
+        lastNewFiber.sibling  = newFiber
+        lastNewFiber = lastNewFiber.sibling
+      }
+      if (!shouldTrackEffects) {
+        continue
+      }
+
+      const current = newFiber.alternate
+      if (current !== null) {
+        const oldIndex = current.index
+        if (oldIndex < lastPlacedIndex) {
+          // 移动
+          newFiber.flags |= Placement
+          continue
+        } else {
+          lastPlacedIndex = oldIndex
+        }
+      } else {
+        // mount
+        // 插入
+        newFiber.flags |= Placement
+      }
+      
+    }
+    // 将Map中剩下的标记为删除
+    existingChildren.forEach(fiber => {
+      deleteChild(returnFiber, fiber)
+    })
+
+    return firstNewFiber
+  }
+
+  function updateFromMap(returnFiber: FiberNode, existingChildren: ExistingChildren, index: number, element: any): FiberNode | null {
+    const keyToUse = element.key !== null ? element.key : index
+    const before = existingChildren.get(keyToUse)
+
+    // HostText
+    if (typeof element === 'string' || typeof element === 'number') {
+      if (before) {
+        // 判断类型是否一致
+        if (before.tag === HostText) {
+          // 可复用就移除
+          existingChildren.delete(keyToUse)
+          return useFiber(before, { content: `${element}` })
+        }
+      }
+      // 没有复用的就创建
+      return new FiberNode(HostText, { content: `${element}` }, null)
+    }
+
+    // HostComponent
+    if (typeof element === 'object' && element !== null) {
+      switch (element.$$typeof) {
+        case REACT_ELEMENT_TYPE:
+          if (before) {
+            // 可复用
+            if (before.type === element.type) {
+              existingChildren.delete(keyToUse)
+              return useFiber(before, element.props)
+            }
+          }
+          return createFiberFromElement(element)
+      }
+    }
+
+    if (Array.isArray(element) && __DEV__) {
+      console.warn('未实现数组的child')
+    }
+
+    return null
+  }
+
   return function(returnFiber: FiberNode, currentFiber: FiberNode | null, newChild?: ReactElementType) {
 
     if (typeof newChild === 'object' && newChild !== undefined) {
@@ -107,13 +216,16 @@ function ChildReconciler(shouldTrackEffects: boolean) {
       
         default:
           if (__DEV__) {
-            console.warn('未实现的reconcile类型 1', newChild)
+            console.warn('未实现的reconcile类型', newChild)
           }
           break
       }
-    }
 
-    // TODO 多节点情况
+      //多节点情况
+      if (Array.isArray(newChild)) {
+        return reconcileChildrenArray(returnFiber, currentFiber, newChild)
+      }
+    }
 
     // HostText
     if (typeof newChild === 'string' || typeof newChild === 'number') {
