@@ -1,4 +1,3 @@
-import { type } from 'os'
 import { REACT_ELEMENT_TYPE } from 'shared/ReactSymbols'
 import { Props, ReactElementType } from 'shared/ReactTypes'
 import { createFiberFromElement, createWorkInProcess, FiberNode } from './fiber'

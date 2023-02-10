@@ -17,6 +17,10 @@ export const appendInitialChild = (parent: Instance | Container, child: Instance
   parent.appendChild(child)
 }
 
+export function insertChildToContainer(child: Instance, container: Container, before: Instance) {
+  container.insertBefore(child, before)
+}
+
 export const createTextInstance = (content: string) => {
   return document.createTextNode(content)
 }
