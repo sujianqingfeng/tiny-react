@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { ReactElementType } from 'shared/ReactTypes'
 import { mountChildFibers, reconcileChildFibers } from './childFibers'
 import { FiberNode } from './fiber'
@@ -18,6 +19,9 @@ export function beginWork(wip: FiberNode) {
 
     case FunctionComponent:
       return updateFunctionComponent(wip)
+    
+    case Fragment:
+      return updateFragment(wip)
   
     default:
       if (__DEV__) {
@@ -27,6 +31,12 @@ export function beginWork(wip: FiberNode) {
   }
 
   return null
+}
+
+function updateFragment(wip: FiberNode) {
+  const nextChildren  = wip.pendingProps 
+  reconcileChildren(wip, nextChildren)
+  return wip.child
 }
 
 function updateFunctionComponent(wip: FiberNode) {
@@ -60,6 +70,7 @@ function reconcileChildren(wip: FiberNode, children?: ReactElementType) {
   const current = wip.alternate
   // 对比的是 current 下的 child fiber 和 react element type
   
+  // update
   if (current !== null) {
     wip.child = reconcileChildFibers(wip, current?.child, children)
   } else {
