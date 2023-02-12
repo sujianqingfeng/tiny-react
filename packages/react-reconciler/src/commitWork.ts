@@ -55,23 +55,41 @@ function commitMutationEffectsOnFiber(finishedWork: FiberNode) {
   }
 }
 
+function recordHostChildrenToDelete(childrenToDelete: FiberNode[], unmountFiber: FiberNode) {
+
+  // 找到第一个root host节点
+  const lastOne = childrenToDelete[childrenToDelete.length - 1]
+  // 没找到一个host节点 判断这个节点是补充上一次那个节点的兄弟节点
+
+  if (!lastOne) {
+    childrenToDelete.push(unmountFiber)
+  } else {
+    
+    let node = lastOne.sibling
+    while (node !== null) {
+      if (node === unmountFiber) {
+        childrenToDelete.push(unmountFiber)
+        break
+      }
+      
+      node = node.sibling
+    }
+  }
+}
+
 function commitDeletion(childToDelete: FiberNode) {
-  let rootHostNode: FiberNode | null = null 
+  const rootChildrenToDelete: FiberNode[]  = []
 
   commitNestedComponent(childToDelete, (unmountFiber) => {
 
     switch (unmountFiber.tag) {
       case HostComponent:
-        if (rootHostNode === null) {
-          rootHostNode = unmountFiber
-        }
+        recordHostChildrenToDelete(rootChildrenToDelete, unmountFiber)
         //TODO 解绑ref
         return 
 
       case HostText:
-        if (rootHostNode === null) {
-          rootHostNode = unmountFiber
-        }
+        recordHostChildrenToDelete(rootChildrenToDelete, unmountFiber)
         return
       case FunctionComponent:
         // TODO useEffect unmount
@@ -85,10 +103,12 @@ function commitDeletion(childToDelete: FiberNode) {
     }
   })
 
-  if (rootHostNode !== null) {
+  if (rootChildrenToDelete.length) {
     const hostParent = getHostParent(childToDelete)
     if (hostParent !== null) {
-      removeChild((rootHostNode as FiberNode).stateNode, hostParent)
+      rootChildrenToDelete.forEach((node) => {
+        removeChild(node.stateNode, hostParent)
+      })
     }
   }
 

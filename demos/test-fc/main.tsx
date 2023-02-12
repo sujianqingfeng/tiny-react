@@ -12,7 +12,14 @@ function App() {
     <li key="2">2</li>,
     <li key="1">1</li>,
   ]
-  return <ul onClick={() => setNum(num + 1)}>{arr}</ul>
+
+  return (
+    <ul onClick={() => setNum(num + 1)}>
+      <li>a</li>
+      <li>b</li>
+      {arr}
+    </ul>
+  )
 }
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

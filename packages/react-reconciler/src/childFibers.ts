@@ -234,6 +234,11 @@ function ChildReconciler(shouldTrackEffects: boolean) {
     }
 
     if (typeof newChild === 'object' && newChild !== undefined) {
+      //多节点情况
+      if (Array.isArray(newChild)) {
+        return reconcileChildrenArray(returnFiber, currentFiber, newChild)
+      }
+
       switch (newChild.$$typeof) {
         case REACT_ELEMENT_TYPE:
           return placeSingleChild(reconcileSingleElement(returnFiber, currentFiber, newChild)) 
@@ -244,11 +249,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
           }
           break
       }
-
-      //多节点情况
-      if (Array.isArray(newChild)) {
-        return reconcileChildrenArray(returnFiber, currentFiber, newChild)
-      }
+      
     }
 
     // HostText

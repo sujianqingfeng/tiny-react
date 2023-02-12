@@ -1,6 +1,7 @@
 import { Dispatcher, resolveDispatcher } from './src/currentDispatcher'
 import currentDispatcher from './src/currentDispatcher'
 import { jsx } from './src/jsx'
+import { REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols'
 
 export const useState: Dispatcher['useState'] = (initialState) => {
   const dispatcher = resolveDispatcher()

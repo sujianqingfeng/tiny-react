@@ -1,10 +1,9 @@
-import { Fragment } from 'react'
 import { ReactElementType } from 'shared/ReactTypes'
 import { mountChildFibers, reconcileChildFibers } from './childFibers'
 import { FiberNode } from './fiber'
 import { renderWithHooks } from './fiberHooks'
 import { processUpdateQueue, UpdateQueue } from './updateQueue'
-import { FunctionComponent, HostComponent, HostRoot, HostText } from './workTags'
+import { Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from './workTags'
 
 export function beginWork(wip: FiberNode) {
   // 比较 返回子FiberNode
