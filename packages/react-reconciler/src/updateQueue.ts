@@ -3,6 +3,7 @@ import { Action } from 'shared/ReactTypes'
 
 export interface Update<State> {
   action: Action<State>
+  next: Update<any> | null
 }
 
 export interface UpdateQueue<State> {
@@ -15,7 +16,8 @@ export interface UpdateQueue<State> {
 // 创建update
 export const createUpdate = <State>(action: Action<State>) => {
   return {
-    action
+    action,
+    next: null
   }
 }
 
@@ -31,6 +33,14 @@ export const createUpdateQueue = <State>() => {
 
 // 添加update
 export const enqueueUpdate = <State>(updateQueue: UpdateQueue<State>, update: Update<State>) => {
+  // 这里是一个环状的链表
+  const pending = updateQueue.shared.pending
+  if (pending === null) {
+    update.next = update
+  } else {
+    update.next = pending.next
+    pending.next = update
+  }
   updateQueue.shared.pending = update
 }
 
