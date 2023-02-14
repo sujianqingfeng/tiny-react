@@ -1,6 +1,7 @@
 import { Container } from 'hostConfig'
 import type { Key, Props, ReactElementType, Ref } from 'shared/ReactTypes'
 import { Flags, NoFlags } from './fiberFlags'
+import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes'
 import { Fragment, FunctionComponent, HostComponent, WorkTag } from './workTags'
 
 export class FiberNode {
@@ -69,11 +70,17 @@ export class FiberRootNode {
   current: FiberNode
   // 结束之后的
   finishedWork: FiberNode | null
+  // 未处理的lanes 
+  pendingLanes: Lanes
+  // 处理完成的lane
+  finishLean: Lane
 
   constructor(container: Container, hostFiberNode: FiberNode) {
     this.container = container
     this.current = hostFiberNode
     this.finishedWork = null
+    this.pendingLanes = NoLanes
+    this.finishLean = NoLane
 
     // HostFiberNode 关联 FiberRootNode
     // eslint-disable-next-line @typescript-eslint/no-this-alias

@@ -2,6 +2,7 @@ import { Dispatch, Dispatcher } from 'react/src/currentDispatcher'
 import internals from 'shared/internals'
 import { Action } from 'shared/ReactTypes'
 import { FiberNode } from './fiber'
+import { requestUpdateLane } from './fiberLanes'
 import { createUpdate, createUpdateQueue, enqueueUpdate, processUpdateQueue, UpdateQueue } from './updateQueue'
 import { scheduleUpdateOnFiber } from './workLoop'
 
@@ -94,9 +95,11 @@ function dispatchSetState<State>(
   updateQueue: UpdateQueue<State>,
   action: Action<State>
 ) {
-  const update = createUpdate(action)
+
+  const lane = requestUpdateLane()
+  const update = createUpdate(action, lane)
   enqueueUpdate(updateQueue, update)
-  scheduleUpdateOnFiber(fiber)
+  scheduleUpdateOnFiber(fiber, lane)
 }
 
 function updateWorkInProgressHook(): Hook {
