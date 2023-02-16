@@ -9,9 +9,11 @@ import { flushSyncCallback, scheduleSyncCallback } from './syncTaskQueue'
 import { HostRoot } from './workTags'
 
 let workInProgress: FiberNode | null = null
+let wipRootRenderLane: Lane = NoLane
 
-function prepareFreshStack(root: FiberRootNode) {
+function prepareFreshStack(root: FiberRootNode, lane: Lane) {
   workInProgress = createWorkInProcess(root.current, {})
+  wipRootRenderLane =  lane
 }
 
 // 调度update
@@ -72,7 +74,7 @@ export function preformSyncWorkOnRoot(root: FiberRootNode, lane: Lane) {
   }
   
   // 最开始的节点
-  prepareFreshStack(root)
+  prepareFreshStack(root, lane)
 
   do {
     try {
@@ -89,6 +91,8 @@ export function preformSyncWorkOnRoot(root: FiberRootNode, lane: Lane) {
 
   const finishedWork = root.current.alternate
   root.finishedWork = finishedWork
+  root.finishLean = lane
+  wipRootRenderLane = NoLane
 
   commitRoot(root)
 }
@@ -130,7 +134,7 @@ function workLoop() {
 
 // 开始递进
 function performUnitOfWork(fiber: FiberNode) {
-  const next = beginWork(fiber)
+  const next = beginWork(fiber, wipRootRenderLane)
   fiber.memoizedProps = fiber.pendingProps
   // 子节点遍历完成
   if (next === null) {

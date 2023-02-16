@@ -2,22 +2,23 @@ import { ReactElementType } from 'shared/ReactTypes'
 import { mountChildFibers, reconcileChildFibers } from './childFibers'
 import { FiberNode } from './fiber'
 import { renderWithHooks } from './fiberHooks'
+import { Lane } from './fiberLanes'
 import { processUpdateQueue, UpdateQueue } from './updateQueue'
 import { Fragment, FunctionComponent, HostComponent, HostRoot, HostText } from './workTags'
 
-export function beginWork(wip: FiberNode) {
+export function beginWork(wip: FiberNode, renderLane: Lane) {
   // 比较 返回子FiberNode
 
   switch (wip.tag) {
     case HostRoot:
-      return updateHostRoot(wip)
+      return updateHostRoot(wip, renderLane)
     case HostComponent:
       return updateHostComponent(wip)
     case HostText:
       return null
 
     case FunctionComponent:
-      return updateFunctionComponent(wip)
+      return updateFunctionComponent(wip, renderLane)
     
     case Fragment:
       return updateFragment(wip)
@@ -38,13 +39,13 @@ function updateFragment(wip: FiberNode) {
   return wip.child
 }
 
-function updateFunctionComponent(wip: FiberNode) {
+function updateFunctionComponent(wip: FiberNode, renderLane: Lane) {
   const nextChildren  = renderWithHooks(wip)
   reconcileChildren(wip, nextChildren)
   return wip.child
 }
 
-function updateHostRoot(wip: FiberNode) {
+function updateHostRoot(wip: FiberNode, renderLane: Lane) {
   const baseState = wip.memoizedState
   const updateQueue = wip.updateQueue as UpdateQueue<Element>
   const pending = updateQueue.shared.pending
