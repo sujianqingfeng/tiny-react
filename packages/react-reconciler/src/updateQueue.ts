@@ -50,18 +50,34 @@ export const enqueueUpdate = <State>(updateQueue: UpdateQueue<State>, update: Up
 // 消费update
 export const processUpdateQueue = <State>(
   baseState: State,
-  pendingUpdate: Update<State> | null
+  pendingUpdate: Update<State> | null,
+  renderLane: Lane
 ): {memoizedState: State} => {
   const result: ReturnType<typeof processUpdateQueue<State>> = {
     memoizedState: baseState
   }
-  if (pendingUpdate) {
-    // 是函數就調用獲取
-    if (pendingUpdate.action instanceof Function) {
-      result.memoizedState = pendingUpdate.action(baseState)
-    } else {
-      result.memoizedState = pendingUpdate.action
-    }
+  if (pendingUpdate !== null) {
+    // 第一个update
+    const first = pendingUpdate.next
+    let pending = pendingUpdate.next as Update<any>
+
+    do {
+      const updateLane = pending?.lane 
+      if (updateLane === renderLane) {
+        // 是函數就調用獲取
+        if (pendingUpdate.action instanceof Function) {
+          baseState = pending.action(baseState)
+        } else {
+          baseState = pendingUpdate.action
+        }
+      } else {
+        if (__DEV__) {
+          console.error('不应该进入updateLane !== renderLane')
+        }
+      }
+      pending = pending?.next as Update<any>
+    } while (pending !== first)
   }
+  result.memoizedState = baseState
   return result
 }

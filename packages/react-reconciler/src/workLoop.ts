@@ -4,7 +4,7 @@ import { commitMutationEffects } from './commitWork'
 import { completeWork } from './completeWork'
 import { createWorkInProcess, FiberNode, FiberRootNode } from './fiber'
 import { MutationMask, NoFlags } from './fiberFlags'
-import { getHighestPriorityLane, Lane, mergeLanes, NoLane, SyncLane } from './fiberLanes'
+import { getHighestPriorityLane, Lane, markRootFinished, mergeLanes, NoLane, SyncLane } from './fiberLanes'
 import { flushSyncCallback, scheduleSyncCallback } from './syncTaskQueue'
 import { HostRoot } from './workTags'
 
@@ -64,6 +64,7 @@ function markUpdateFromFiberToRoot(fiber: FiberNode) {
 }
 
 export function preformSyncWorkOnRoot(root: FiberRootNode, lane: Lane) {
+  
   const nextLane = getHighestPriorityLane(root.pendingLanes)
 
   if (nextLane !== SyncLane) {
@@ -71,6 +72,10 @@ export function preformSyncWorkOnRoot(root: FiberRootNode, lane: Lane) {
     // 或者NoLane
     ensureRootIsSchedule(root)
     return
+  }
+
+  if (__DEV__) {
+    console.log('render start')
   }
   
   // 最开始的节点
@@ -104,11 +109,19 @@ function commitRoot(root: FiberRootNode) {
     return
   }
 
-  root.finishedWork  = null
-
   if (__DEV__) {
     console.log('commit start')
   }
+  const lane = root.finishLean
+  if (lane === NoLane && __DEV__) {
+    console.error('不应该为NoLane')
+  }
+
+  root.finishedWork  = null
+  root.finishLean = NoLane
+
+  // 移除消费的lane
+  markRootFinished(root, lane)
 
   // 判断根节点以及子节点 是否存在更新
   const subtreeHasEffect = (finishedWork.subtreeFlags & MutationMask) !== NoFlags
