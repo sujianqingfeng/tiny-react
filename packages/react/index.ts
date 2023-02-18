@@ -1,11 +1,15 @@
 import { Dispatcher, resolveDispatcher } from './src/currentDispatcher'
 import currentDispatcher from './src/currentDispatcher'
 import { jsx } from './src/jsx'
-import { REACT_FRAGMENT_TYPE } from 'shared/ReactSymbols'
 
 export const useState: Dispatcher['useState'] = (initialState) => {
   const dispatcher = resolveDispatcher()
   return dispatcher.useState(initialState)
+}
+
+export const useEffect: Dispatcher['useEffect'] = (create, deps) => {
+  const dispatcher = resolveDispatcher()
+  return dispatcher.useEffect(create, deps)
 }
 
 // 数据共享层
