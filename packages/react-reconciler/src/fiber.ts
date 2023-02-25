@@ -1,6 +1,7 @@
 import { Container } from 'hostConfig'
 import type { Key, Props, ReactElementType, Ref } from 'shared/ReactTypes'
 import { Flags, NoFlags } from './fiberFlags'
+import { Effect } from './fiberHooks'
 import { Lane, Lanes, NoLane, NoLanes } from './fiberLanes'
 import { Fragment, FunctionComponent, HostComponent, WorkTag } from './workTags'
 
@@ -63,6 +64,11 @@ export class FiberNode {
   }
 }
 
+export interface PendingPassiveEffects {
+  unmount: Effect[]
+  update: Effect[]
+}
+
 // 根节点
 export class FiberRootNode {
   container: Container
@@ -74,6 +80,7 @@ export class FiberRootNode {
   pendingLanes: Lanes
   // 处理完成的lane
   finishLean: Lane
+  pendingPassiveEffects: PendingPassiveEffects
 
   constructor(container: Container, hostFiberNode: FiberNode) {
     this.container = container
@@ -81,10 +88,15 @@ export class FiberRootNode {
     this.finishedWork = null
     this.pendingLanes = NoLanes
     this.finishLean = NoLane
+    this.pendingPassiveEffects = {
+      unmount: [],
+      update: []
+    }
 
     // HostFiberNode 关联 FiberRootNode
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     hostFiberNode.stateNode = this
+
   }
 }
 

@@ -39,7 +39,10 @@ export interface FCUpdateQueue<State> extends UpdateQueue<State> {
 export function renderWithHooks(wip: FiberNode, lane: Lane) {
   // 赋值
   currentlyRenderingFiber = wip
+  // 重置hooks 链表
   wip.memoizedState = null
+  // 重置effect 链表
+  wip.updateQueue = null
 
   renderLane = lane
 
@@ -72,7 +75,7 @@ const HooksDispatcherOnMount: Dispatcher  = {
 
 const HooksDispatcherOnUpdate: Dispatcher  = {
   useState: updateState,
-  useEffect: mountEffect
+  useEffect: updateEffect
 }
 
 function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
@@ -80,6 +83,45 @@ function mountEffect(create: EffectCallback | void, deps: EffectDeps | void) {
   const nextDeps = deps === undefined ? null : deps;
   (currentlyRenderingFiber as FiberNode).flags |= PassiveEffect
   hook.memoizedState = pushEffect(Passive | HookHasEffect, create, undefined, nextDeps)
+}
+
+function updateEffect(create: EffectCallback | void, deps: EffectDeps | void) {
+  const hook = updateWorkInProgressHook()
+  const nextDeps = deps === undefined ? null : deps
+  let destroy: EffectCallback | void 
+
+  if (currentHook !== null) {
+    const prevEffect = currentHook.memoizedState as Effect
+    destroy = prevEffect.destroy
+    
+    if (nextDeps !== null) {
+      // 浅比较
+      const prevDeps = prevEffect.deps
+      // 依赖没有变化
+      if (areHookInputsEqual(nextDeps, prevDeps)) {
+        hook.memoizedState = pushEffect(Passive, create, destroy, nextDeps)
+        return
+      }
+    }
+    //依赖不相等
+    (currentlyRenderingFiber as FiberNode).flags |= PassiveEffect
+    hook.memoizedState = pushEffect(Passive | HookHasEffect, create, destroy, nextDeps)
+  }
+}
+
+function areHookInputsEqual(nextDeps: EffectDeps, prevDeps: EffectDeps) {
+  if (prevDeps === null || nextDeps  === null) {
+    return false
+  }
+
+  for (let i = 0; i < prevDeps.length && i < nextDeps.length; i++) {
+    if (Object.is(prevDeps[i], nextDeps[i])) {
+      continue
+    }
+    return false
+
+  }
+  return true
 }
 
 function pushEffect(hookFlags: Flags, create: EffectCallback | void, destroy: EffectCallback | void, deps: EffectDeps): Effect {
