@@ -1,5 +1,5 @@
 import { FiberNode } from 'react-reconciler/src/fiber'
-import { HostText } from 'react-reconciler/src/workTags'
+import { HostComponent, HostText } from 'react-reconciler/src/workTags'
 import { Props } from 'shared/ReactTypes'
 import { DOMElement, updateFiberProps } from './SyntheticEvent'
 
@@ -34,6 +34,8 @@ export function commitUpdate(fiber: FiberNode) {
       // eslint-disable-next-line no-case-declarations
       const text = fiber.memoizedProps.content
       return commitTextUpdate(fiber.stateNode, text)
+    case HostComponent:
+      return  updateFiberProps(fiber.stateNode, fiber.memoizedProps)
   
     default:
       if (__DEV__) {
