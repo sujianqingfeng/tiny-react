@@ -214,7 +214,7 @@ function commitNestedComponent(root: FiberNode, onCommitUnmount: (fiber: FiberNo
 
 function commitPlacement(finishedWork: FiberNode) {
   if (__DEV__) {
-    console.log('commitPlacement', finishedWork)
+    console.log('commitPlacement')
   }
 
   // parent dom

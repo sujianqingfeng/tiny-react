@@ -3,5 +3,8 @@
     "jest": true
   },
   "extends": "@sujian/typescript",
-  "ignorePatterns": ["packages/**/*.test.ts"]
+  "ignorePatterns": ["packages/**/*.test.ts"],
+  "rules": {
+    "@typescript-eslint/no-var-requires": "off"
+  }
 }

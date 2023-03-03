@@ -233,7 +233,7 @@ function ChildReconciler(shouldTrackEffects: boolean) {
       newChild = newChild?.props.children
     }
 
-    if (typeof newChild === 'object' && newChild !== undefined) {
+    if (typeof newChild === 'object' && newChild !== null) {
       //多节点情况
       if (Array.isArray(newChild)) {
         return reconcileChildrenArray(returnFiber, currentFiber, newChild)
